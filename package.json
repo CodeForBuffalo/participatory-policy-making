@@ -1,0 +1,29 @@
+{
+    "name": "participatory-policy-making",
+    "version": "0.0.1",
+    "scripts": {
+        "backend": "cd backend && pipenv run python manage.py runserver",
+        "frontend": "cd frontend && npm run serve",
+        "start": "concurrently -n \"backend,frontend\" -c \"bgWhite,bgCyan\" \"npm run backend\" \"npm run frontend\"",
+        "setup": "npm run concurrently-install && npm run python-setup && npm run vue-setup",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "concurrently-install": "npm install concurrently --save",
+        "python-setup": "pip install pipenv && npm run pipenv-sync && npm run django-migrate",
+        "pipenv-sync": "cd backend && pipenv sync",
+        "vue-setup": "cd frontend && npm install",
+        "django-migrate": "cd backend && pipenv run python manage.py migrate",
+        "quickstart": "npm run setup && npm run start"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/CodeForBuffalo/participatory-policy-making.git"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/CodeForBuffalo/participatory-policy-making/issues"
+    },
+    "homepage": "https://github.com/CodeForBuffalo/participatory-policy-making#readme",
+    "dependencies": {
+        "concurrently": "^5.3.0"
+    }
+}
