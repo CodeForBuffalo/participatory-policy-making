@@ -9,6 +9,7 @@
             </li>
           </ul>
         </div>
+        <!-- eslint-disable-next-line -->
         <div v-html="$md.render(srcContent.body)"></div>
       </b-col>
     </b-row>
@@ -30,6 +31,38 @@ export default {
           srcContent: fm(res),
         }
       })
+  },
+  data() {
+    return {
+      annotator: null,
+    }
+  },
+  mounted() {
+    this.initAnnotator()
+  },
+  methods: {
+    initAnnotator() {
+      const log = () => {
+        return {
+          annotationCreated(annotation) {
+            console.log(annotation)
+          },
+        }
+      }
+      /* eslint-disable no-undef */
+      this.annotator = new annotator.App()
+      this.annotator.include(annotator.ui.main)
+      this.annotator.include(log)
+      this.annotator.start()
+      /* eslint-enable no-undef */
+    },
+  },
+  head: {
+    script: [
+      {
+        src: '/js/annotator.min.js',
+      },
+    ],
   },
 }
 </script>
