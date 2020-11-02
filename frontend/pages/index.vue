@@ -93,7 +93,6 @@ export default {
       }
       /* eslint-disable no-undef */
       this.annotator = new annotator.App()
-      console.log(annotator.ui.tags.viewerExtension)
       this.annotator.include(annotator.ui.main, {
         element: document.querySelector('#content'),
       })
