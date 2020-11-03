@@ -22,8 +22,11 @@
       shadow
       right
     >
-      <div class="p-4">
-        {{ active.text }}
+      <div v-if="activeComment" class="p-4">
+        <span class="font-weight-bold lead">"{{ activeComment.quote }}"</span>
+        <div>
+          <span>{{ activeComment.text }}</span>
+        </div>
       </div>
     </b-sidebar>
   </div>
@@ -48,9 +51,8 @@ export default {
   data() {
     return {
       annotator: null,
-      active: {},
+      activeId: null,
       sidebarIsOpen: false,
-      annotations: [],
       existing: [
         {
           id: 1,
@@ -67,6 +69,13 @@ export default {
         },
       ],
     }
+  },
+  computed: {
+    activeComment() {
+      return this.existing.find((a) => {
+        return a.id === Number(this.activeId)
+      })
+    },
   },
   mounted() {
     this.initAnnotator()
@@ -88,8 +97,7 @@ export default {
       e.stopPropagation()
 
       const target = e.target
-      this.active.id = target.getAttribute('data-annotation-id')
-      this.active.text = target.innerHTML
+      this.activeId = target.getAttribute('data-annotation-id')
       this.toggleSidebar()
       // this.onSelected(annotationId)
     },
@@ -105,14 +113,14 @@ export default {
         return {
           annotationCreated(annotation) {
             // console.log(annotation)
-            self.annotations.push({
+            self.existing.push({
               id: annotation.id,
               text: annotation.text,
               ranges: annotation.ranges,
               quote: annotation.quote,
             })
             const el = annotation._local.highlights[0]
-            this.attachListener(el)
+            self.attachListener(el)
           },
         }
       }
@@ -120,7 +128,7 @@ export default {
       const load = () => {
         return {
           annotationsLoaded(annotations) {
-            // console.log(annotations)
+            console.log(annotations)
             annotations.forEach((a) => {
               const el = a._local.highlights[0]
               self.attachListener(el)
@@ -130,7 +138,6 @@ export default {
       }
       /* eslint-disable no-undef */
       this.annotator = new annotator.App()
-      this.annotator.include(annotator.storage.debug)
       this.annotator.include(annotator.ui.main, {
         element: document.querySelector('#content'),
       })
@@ -142,7 +149,6 @@ export default {
         // this.annotator.annotations.load(this.existing)
       })
       this.annotator.runHook('annotationsLoaded', [this.existing])
-
       /* eslint-enable no-undef */
     },
   },
