@@ -50,6 +50,22 @@ export default {
       annotator: null,
       active: {},
       sidebarIsOpen: false,
+      annotations: [],
+      existing: [
+        {
+          id: 1,
+          text: 'this is a loaded annotation',
+          ranges: [
+            {
+              start: '/ol[1]/li[2]',
+              startOffset: 277,
+              end: '/ol[1]/li[2]',
+              endOffset: 315,
+            },
+          ],
+          quote: 'The required minimum number of spaces',
+        },
+      ],
     }
   },
   mounted() {
@@ -77,27 +93,56 @@ export default {
       this.toggleSidebar()
       // this.onSelected(annotationId)
     },
+    attachListener(el) {
+      el.mouseover = null
+      el.addEventListener('click', (e) => {
+        this.annotationSelected(e)
+      })
+    },
     initAnnotator() {
       const self = this
       const log = () => {
         return {
           annotationCreated(annotation) {
             // console.log(annotation)
+            self.annotations.push({
+              id: annotation.id,
+              text: annotation.text,
+              ranges: annotation.ranges,
+              quote: annotation.quote,
+            })
             const el = annotation._local.highlights[0]
-            el.mouseover = null
-            el.addEventListener('click', (e) => {
-              self.annotationSelected(e)
+            this.attachListener(el)
+          },
+        }
+      }
+
+      const load = () => {
+        return {
+          annotationsLoaded(annotations) {
+            // console.log(annotations)
+            annotations.forEach((a) => {
+              const el = a._local.highlights[0]
+              self.attachListener(el)
             })
           },
         }
       }
       /* eslint-disable no-undef */
       this.annotator = new annotator.App()
+      this.annotator.include(annotator.storage.debug)
       this.annotator.include(annotator.ui.main, {
         element: document.querySelector('#content'),
       })
       this.annotator.include(log)
-      this.annotator.start()
+      this.annotator.include(load)
+
+      this.annotator.start().then(() => {
+        // console.log(this.existing)
+        // this.annotator.annotations.load(this.existing)
+      })
+      this.annotator.runHook('annotationsLoaded', [this.existing])
+
       /* eslint-enable no-undef */
     },
   },
