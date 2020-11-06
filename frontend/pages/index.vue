@@ -1,8 +1,15 @@
 <template>
   <div>
-    <b-container>
+    <b-container fluid>
       <b-row>
-        <b-col>
+        <b-col md="3" class="d-none d-md-block fixed-top">
+          <ul v-if="headings.length">
+            <li v-for="(heading, idx) in headings" :key="idx">
+              <a :href="`#${heading.id}`">{{ heading.text }}</a>
+            </li>
+          </ul>
+        </b-col>
+        <b-col md="9" offset-md="3">
           <div>
             <ul>
               <li v-for="(attr, idx) in md.attributes" :key="idx">
@@ -77,28 +84,27 @@ export default {
         return a.id === Number(this.activeId)
       })
     },
-  },
-  mounted() {
-    this.initAnnotator()
-    this.getHeadings()
-  },
-  methods: {
-    getHeadings() {
-      const self = this
-      this.md.headings = []
+    headings() {
+      const headings = []
       const renderer = {
         heading(text, level) {
-          self.md.headings.push({
+          headings.push({
             text,
             level,
-            escapedText: text.toLowerCase().replace(/[^\w]+/g, '-'),
+            id: text.toLowerCase().replace(/[^\w]+/g, '-'),
           })
         },
       }
 
       marked.use({ renderer })
-      return marked(this.md.body)
+      marked(this.md.body)
+      return headings
     },
+  },
+  mounted() {
+    this.initAnnotator()
+  },
+  methods: {
     toggleSidebar() {
       this.sidebarIsOpen = !this.sidebarIsOpen
     },
