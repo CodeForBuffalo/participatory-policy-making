@@ -11,7 +11,7 @@
                   :class="{ 'is-active': isActive.bold() }"
                   @click="commands.bold"
                 >
-                  <icon name="bold" />
+                  <b-icon icon="type-bold" />
                 </button>
 
                 <button
@@ -19,7 +19,7 @@
                   :class="{ 'is-active': isActive.italic() }"
                   @click="commands.italic"
                 >
-                  <icon name="italic" />
+                  <b-icon icon="type-italic" />
                 </button>
 
                 <button
@@ -27,7 +27,7 @@
                   :class="{ 'is-active': isActive.strike() }"
                   @click="commands.strike"
                 >
-                  <icon name="strike" />
+                  <b-icon icon="type-strikethrough" />
                 </button>
 
                 <button
@@ -35,7 +35,7 @@
                   :class="{ 'is-active': isActive.underline() }"
                   @click="commands.underline"
                 >
-                  <icon name="underline" />
+                  <b-icon icon="type-underline" />
                 </button>
 
                 <button
@@ -43,7 +43,7 @@
                   :class="{ 'is-active': isActive.code() }"
                   @click="commands.code"
                 >
-                  <icon name="code" />
+                  <b-icon icon="code" />
                 </button>
 
                 <button
@@ -51,7 +51,7 @@
                   :class="{ 'is-active': isActive.paragraph() }"
                   @click="commands.paragraph"
                 >
-                  <icon name="paragraph" />
+                  <b-icon icon="paragraph" />
                 </button>
 
                 <button
@@ -83,7 +83,7 @@
                   :class="{ 'is-active': isActive.bullet_list() }"
                   @click="commands.bullet_list"
                 >
-                  <icon name="ul" />
+                  <b-icon icon="list-ul" />
                 </button>
 
                 <button
@@ -91,7 +91,7 @@
                   :class="{ 'is-active': isActive.ordered_list() }"
                   @click="commands.ordered_list"
                 >
-                  <icon name="ol" />
+                  <b-icon icon="list-ol" />
                 </button>
 
                 <button
@@ -99,7 +99,7 @@
                   :class="{ 'is-active': isActive.blockquote() }"
                   @click="commands.blockquote"
                 >
-                  <icon name="quote" />
+                  <b-icon icon="blockquote-left" />
                 </button>
 
                 <button
@@ -107,22 +107,22 @@
                   :class="{ 'is-active': isActive.code_block() }"
                   @click="commands.code_block"
                 >
-                  <icon name="code" />
+                  <b-icon icon="code" />
                 </button>
 
                 <button
                   class="menubar__button"
                   @click="commands.horizontal_rule"
                 >
-                  <icon name="hr" />
+                  <b-icon icon="dash" />
                 </button>
 
                 <button class="menubar__button" @click="commands.undo">
-                  <icon name="undo" />
+                  <b-icon icon="arrow-counterclockwise" />
                 </button>
 
                 <button class="menubar__button" @click="commands.redo">
-                  <icon name="redo" />
+                  <b-icon icon="arrow-clockwise" />
                 </button>
               </div>
             </editor-menu-bar>
@@ -155,14 +155,52 @@ import {
   Underline,
   History,
 } from 'tiptap-extensions'
-import Icon from '@/components/icon'
+import {
+  BIcon,
+  BIconBlockquoteLeft,
+  BIconCode,
+  BIconTypeH1,
+  BIconTypeH2,
+  BIconTypeH3,
+  BIconListOl,
+  BIconListUl,
+  BIconListCheck,
+  BIconTypeBold,
+  BIconTypeItalic,
+  BIconLink,
+  BIconTypeStrikethrough,
+  BIconTypeUnderline,
+  BIconArrowCounterclockwise,
+  BIconArrowClockwise,
+  BIconParagraph,
+  BIconDash,
+} from 'bootstrap-vue'
 
 export default {
   name: 'Editor',
   components: {
     EditorContent,
     EditorMenuBar,
-    Icon,
+    BIcon,
+    /* eslint-disable vue/no-unused-components */
+    BIconBlockquoteLeft,
+    BIconCode,
+    BIconTypeH1,
+    BIconTypeH2,
+    BIconTypeH3,
+    BIconListOl,
+    BIconListUl,
+    BIconListCheck,
+    BIconTypeBold,
+    BIconTypeItalic,
+    BIconLink,
+    BIconTypeStrikethrough,
+    BIconTypeUnderline,
+    BIconArrowCounterclockwise,
+    BIconParagraph,
+    BIconArrowClockwise,
+    BIconDash,
+    /* eslint-enable vue/no-unused-components */
   },
   data() {
     return {
