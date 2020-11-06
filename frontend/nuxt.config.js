@@ -37,6 +37,20 @@ export default {
   ],
   markdownit: {
     injected: true,
+    use: [
+      [
+        'markdown-it-anchor',
+        {
+          level: 1,
+          slugify: (text) => text.toLowerCase().replace(/[^\w]+/g, '-'),
+          permalink: false,
+          // renderPermalink: (slug, opts, state, permalink) => {},
+          permalinkClass: 'header-anchor',
+          permalinkSymbol: '¶',
+          permalinkBefore: false,
+        },
+      ],
+    ],
   },
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)

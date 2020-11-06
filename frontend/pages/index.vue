@@ -5,13 +5,13 @@
         <b-col>
           <div>
             <ul>
-              <li v-for="(attr, idx) in srcContent.attributes" :key="idx">
+              <li v-for="(attr, idx) in md.attributes" :key="idx">
                 <b>{{ idx }}: </b>{{ attr }}
               </li>
             </ul>
           </div>
           <!-- eslint-disable-next-line -->
-          <div id="content" v-html="$md.render(srcContent.body)"></div>
+          <div id="content" v-html="$md.render(md.body)"></div>
         </b-col>
       </b-row>
     </b-container>
@@ -33,7 +33,8 @@
 </template>
 
 <script>
-import * as fm from 'front-matter'
+import fm from 'front-matter'
+import marked from 'marked'
 
 export default {
   name: 'Home',
@@ -44,7 +45,7 @@ export default {
       )
       .then((res) => {
         return {
-          srcContent: fm(res),
+          md: fm(res),
         }
       })
   },
@@ -79,27 +80,34 @@ export default {
   },
   mounted() {
     this.initAnnotator()
+    this.getHeadings()
   },
   methods: {
+    getHeadings() {
+      const self = this
+      this.md.headings = []
+      const renderer = {
+        heading(text, level) {
+          self.md.headings.push({
+            text,
+            level,
+            escapedText: text.toLowerCase().replace(/[^\w]+/g, '-'),
+          })
+        },
+      }
+
+      marked.use({ renderer })
+      return marked(this.md.body)
+    },
     toggleSidebar() {
       this.sidebarIsOpen = !this.sidebarIsOpen
     },
-    // onSelected(annotationId) {
-    //   if (!annotationId) {
-    //     return false
-    //   }
-    //   const annotation = document.querySelector(
-    //     `[data-annotation-id="${annotationId}"]`
-    //   )
-    //   // console.log(annotation)
-    // },
     annotationSelected(e) {
       e.stopPropagation()
 
       const target = e.target
       this.activeId = target.getAttribute('data-annotation-id')
       this.toggleSidebar()
-      // this.onSelected(annotationId)
     },
     attachListener(el) {
       el.mouseover = null
@@ -112,7 +120,7 @@ export default {
       const log = () => {
         return {
           annotationCreated(annotation) {
-            // console.log(annotation)
+            console.log(annotation)
             self.existing.push({
               id: annotation.id,
               text: annotation.text,
@@ -128,7 +136,7 @@ export default {
       const load = () => {
         return {
           annotationsLoaded(annotations) {
-            console.log(annotations)
+            // console.log(annotations)
             annotations.forEach((a) => {
               const el = a._local.highlights[0]
               self.attachListener(el)
@@ -144,10 +152,7 @@ export default {
       this.annotator.include(log)
       this.annotator.include(load)
 
-      this.annotator.start().then(() => {
-        // console.log(this.existing)
-        // this.annotator.annotations.load(this.existing)
-      })
+      this.annotator.start()
       this.annotator.runHook('annotationsLoaded', [this.existing])
       /* eslint-enable no-undef */
     },
