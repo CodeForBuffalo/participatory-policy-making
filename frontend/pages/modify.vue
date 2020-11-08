@@ -27,7 +27,7 @@
                 </div>
               </div>
               <div v-else>
-                <form @submit="publish()">
+                <form @submit.prevent="publish()">
                   <div class="p-4 border-bottom">
                     <label for="commentEndDate">Comment End Date</label>
                     <b-datepicker
