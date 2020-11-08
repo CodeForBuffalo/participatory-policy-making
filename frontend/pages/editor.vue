@@ -2,7 +2,7 @@
   <div>
     <b-container>
       <b-row>
-        <b-col>
+        <b-col md="9">
           <client-only>
             <editor-menu-bar
               v-slot="{ commands, isActive }"
@@ -10,7 +10,19 @@
               class="mb-1"
             >
               <b-button-toolbar>
-                <b-button-group class="mr-1">
+                <b-button-group size="sm" class="mr-1">
+                  <b-select
+                    :value="getFormatValue()"
+                    :options="formatOptions"
+                    size="sm"
+                    @change.native="
+                      setFormatValue($event.target.value, commands)
+                    "
+                  >
+                  </b-select>
+                </b-button-group>
+
+                <b-button-group size="sm" class="mr-1">
                   <b-button :pressed="isActive.bold()" @click="commands.bold">
                     <b-icon icon="type-bold" aria-hidden="true" />
                   </b-button>
@@ -34,45 +46,31 @@
                   >
                     <b-icon icon="type-underline" aria-hidden="true" />
                   </b-button>
-                </b-button-group>
 
-                <b-button-group class="mr-1">
                   <b-button :pressed="isActive.code()" @click="commands.code">
                     <b-icon icon="code" aria-hidden="true" />
                   </b-button>
+                </b-button-group>
 
+                <b-button-group size="sm" class="mr-1">
                   <b-button
                     :pressed="isActive.paragraph()"
                     @click="commands.paragraph"
                   >
                     <b-icon icon="paragraph" aria-hidden="true" />
                   </b-button>
+
+                  <!-- <b-button
+                    v-for="heading in 6"
+                    :key="heading"
+                    :pressed="isActive.heading({ level: heading })"
+                    @click="commands.heading({ level: heading })"
+                  >
+                    {{ `H${heading}` }}
+                  </b-button> -->
                 </b-button-group>
 
-                <b-button-group class="mr-1">
-                  <b-button
-                    :pressed="isActive.heading({ level: 1 })"
-                    @click="commands.heading({ level: 1 })"
-                  >
-                    H1
-                  </b-button>
-
-                  <b-button
-                    :pressed="isActive.heading({ level: 2 })"
-                    @click="commands.heading({ level: 2 })"
-                  >
-                    H2
-                  </b-button>
-
-                  <b-button
-                    :pressed="isActive.heading({ level: 3 })"
-                    @click="commands.heading({ level: 3 })"
-                  >
-                    H3
-                  </b-button>
-                </b-button-group>
-
-                <b-button-group class="mr-1">
+                <b-button-group size="sm" class="mr-1">
                   <b-button
                     :pressed="isActive.bullet_list()"
                     @click="commands.bullet_list"
@@ -91,22 +89,16 @@
                     :pressed="isActive.blockquote()"
                     @click="commands.blockquote"
                   >
-                    <b-icon icon="blockquote-left" aria-hidden="true" />
+                    <b-icon icon="chat-quote" aria-hidden="true" />
                   </b-button>
 
-                  <b-button
-                    :pressed="isActive.code_block()"
-                    @click="commands.code_block"
-                  >
-                    <b-icon icon="code" aria-hidden="true" />
-                  </b-button>
-
-                  <b-button @click="commands.horizontal_rule">
-                    <b-icon icon="dash" aria-hidden="true" />
+                  <b-button @click="commands.hard_break">
+                    <pre class="text-white mb-0">&lt;br&gt;</pre>
+                    <!-- <b-icon icon="file-break" aria-hidden="true" /> -->
                   </b-button>
                 </b-button-group>
 
-                <b-button-group>
+                <b-button-group size="sm">
                   <b-button @click="commands.undo">
                     <b-icon icon="arrow-counterclockwise" aria-hidden="true" />
                   </b-button>
@@ -120,6 +112,7 @@
             <editor-content :editor="editor" />
           </client-only>
         </b-col>
+        <b-col md="3"></b-col>
       </b-row>
     </b-container>
   </div>
@@ -129,42 +122,32 @@
 import { Editor, EditorContent, EditorMenuBar } from 'tiptap'
 import {
   Blockquote,
-  CodeBlock,
   HardBreak,
   Heading,
-  HorizontalRule,
   OrderedList,
   BulletList,
   ListItem,
-  TodoItem,
-  TodoList,
   Bold,
   Code,
   Italic,
-  Link,
   Strike,
   Underline,
   History,
 } from 'tiptap-extensions'
 import {
   BIcon,
-  BIconBlockquoteLeft,
+  BIconChatQuote,
   BIconCode,
-  BIconTypeH1,
-  BIconTypeH2,
-  BIconTypeH3,
   BIconListOl,
   BIconListUl,
-  BIconListCheck,
   BIconTypeBold,
   BIconTypeItalic,
-  BIconLink,
   BIconTypeStrikethrough,
   BIconTypeUnderline,
-  BIconArrowCounterclockwise,
   BIconArrowClockwise,
+  BIconArrowCounterclockwise,
   BIconParagraph,
-  BIconDash,
+  BIconFileBreak,
 } from 'bootstrap-vue'
 
 export default {
@@ -174,47 +157,52 @@ export default {
     EditorMenuBar,
     BIcon,
     /* eslint-disable vue/no-unused-components */
-    BIconBlockquoteLeft,
+    BIconChatQuote,
     BIconCode,
-    BIconTypeH1,
-    BIconTypeH2,
-    BIconTypeH3,
     BIconListOl,
     BIconListUl,
-    BIconListCheck,
     BIconTypeBold,
     BIconTypeItalic,
-    BIconLink,
     BIconTypeStrikethrough,
     BIconTypeUnderline,
+    BIconArrowClockwise,
     BIconArrowCounterclockwise,
     BIconParagraph,
-    BIconArrowClockwise,
-    BIconDash,
+    BIconFileBreak,
     /* eslint-enable vue/no-unused-components */
   },
   data() {
     return {
       editor: null,
+      htmlContent: '',
+      jsonContent: '',
+      formatOptions: [
+        { text: 'Paragraph', value: 'paragraph' },
+        { text: 'H1', value: 'h1' },
+        { text: 'H2', value: 'h2' },
+        { text: 'H3', value: 'h3' },
+        { text: 'H4', value: 'h4' },
+        { text: 'H5', value: 'h5' },
+        { text: 'H6', value: 'h6' },
+      ],
     }
   },
   mounted() {
     this.editor = new Editor({
+      onUpdate: ({ getHTML, getJSON }) => {
+        this.htmlContent = getHTML()
+        this.jsonContent = getJSON()
+      },
       extensions: [
         new Blockquote(),
-        new CodeBlock(),
         new HardBreak(),
-        new Heading({ levels: [1, 2, 3] }),
-        new HorizontalRule(),
+        new Heading({ levels: [1, 2, 3, 4, 5, 6] }),
         new BulletList(),
         new OrderedList(),
         new ListItem(),
-        new TodoItem(),
-        new TodoList(),
         new Bold(),
         new Code(),
         new Italic(),
-        new Link(),
         new Strike(),
         new Underline(),
         new History(),
@@ -226,6 +214,33 @@ export default {
   },
   beforeDestroy() {
     this.editor.destroy()
+  },
+  methods: {
+    getFormatValue() {
+      const isActive = this.editor.isActive
+      const headings = this.formatOptions.filter((opt) => {
+        return opt.value.startsWith('h')
+      })
+      const activeHeading = headings.find((h) => {
+        const level = Number(h.value.slice(-1))
+        return isActive.heading({ level })
+      })
+
+      if (activeHeading) {
+        return activeHeading.value
+      } else {
+        return 'paragraph'
+      }
+    },
+    setFormatValue(value) {
+      const commands = this.editor.commands
+      if (value.startsWith('h')) {
+        const level = Number(value.slice(-1))
+        return commands.heading({ level })
+      } else {
+        return commands[value]()
+      }
+    },
   },
 }
 </script>
