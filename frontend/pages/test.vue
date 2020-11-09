@@ -3,12 +3,12 @@
     <b-container>
       <b-row>
         <b-col>
-          <div class="mb-4">
-            <button @click="getSelectionString()">Get selection</button>
-
-            <button @click="setSelection()">Set selection from string</button>
-          </div>
-          <div id="textToSelect" @mouseup="promptSelection()">
+          <div class="mb-4"></div>
+          <div
+            id="textToSelect"
+            @mouseup="promptSelection()"
+            @touchend.prevent="promptSelection()"
+          >
             <h1>HTML Ipsum Presents</h1>
 
             <p>
@@ -65,16 +65,19 @@ export default {
     }
   },
   mounted() {
-    document.designMode = 'on'
     this.addKey(document.body)
   },
   methods: {
     promptSelection() {
       const self = this
-      if (confirm('highlight?')) {
-        const range = document.getSelection().getRangeAt(0)
-        self.selectArray.push(self.rangeToObj(range))
-        document.execCommand('HiliteColor', false, 'yellow')
+      const range = document.getSelection().getRangeAt(0)
+      if (document.getSelection().toString().length) {
+        if (confirm('highlight?')) {
+          self.selectArray.push(self.rangeToObj(range))
+          document.designMode = 'on'
+          document.execCommand('HiliteColor', false, 'yellow')
+          document.designMode = 'off'
+        }
       }
     },
     getSelection() {

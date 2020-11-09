@@ -64,6 +64,7 @@ export default {
   methods: {
     signIn() {
       this.busy = true
+      this.errorMessage = 'User not found.'
     },
   },
 }
