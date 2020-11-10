@@ -68,6 +68,7 @@ export default {
       data: [],
       rangy: null,
       highlighter: null,
+      classApplier: null,
       old: [
         'type:textContent|259$304$7$test$',
         'type:textContent|319$361$8$test$',
@@ -81,19 +82,18 @@ export default {
     initRangy() {
       this.rangy = rangy
       this.rangy.init()
+      this.classApplier = this.rangy.createClassApplier('test', {
+        elementAttributes: {
+          'data-foo': 'Hello',
+          style: 'background-color: yellow',
+        },
+      })
       this.highlightOld()
     },
     promptSelection() {
       if (confirm('highlight?')) {
         const highlighter = this.rangy.createHighlighter()
-        highlighter.addClassApplier(
-          rangy.createClassApplier('test', {
-            elementAttributes: {
-              'data-foo': 'Hello',
-              style: 'background-color: yellow',
-            },
-          })
-        )
+        highlighter.addClassApplier(this.classApplier)
         highlighter.highlightSelection('test')
         const serial = highlighter.serialize()
         this.data.push(serial)
@@ -101,14 +101,7 @@ export default {
     },
     highlightOld() {
       const highlighter = this.rangy.createHighlighter()
-      highlighter.addClassApplier(
-        rangy.createClassApplier('test', {
-          elementAttributes: {
-            'data-foo': 'Hello',
-            style: 'background-color: yellow',
-          },
-        })
-      )
+      highlighter.addClassApplier(this.classApplier)
       this.old.forEach((item) => {
         highlighter.deserialize(item)
       })
