@@ -56,88 +56,62 @@
 </template>
 
 <script>
+import rangy from 'rangy/lib/rangy-core.js'
+import 'rangy/lib/rangy-classapplier'
+import 'rangy/lib/rangy-highlighter'
+import 'rangy/lib/rangy-serializer'
+
 export default {
-  name: 'TestPage',
+  name: 'Test2Page',
   data() {
     return {
-      key: 0,
-      selectArray: [],
-      data: [
-        {
-          startKey: '10',
-          startTextIndex: 1,
-          endKey: '10',
-          endTextIndex: 1,
-          startOffset: 159,
-          endOffset: 200,
-        },
+      data: [],
+      rangy: null,
+      highlighter: null,
+      old: [
+        'type:textContent|259$304$7$test$',
+        'type:textContent|319$361$8$test$',
       ],
     }
   },
   mounted() {
-    this.addKey(document.body)
-    this.setSelection()
+    this.initRangy()
   },
   methods: {
+    initRangy() {
+      this.rangy = rangy
+      this.rangy.init()
+      this.highlightOld()
+    },
     promptSelection() {
-      const self = this
-      const range = document.getSelection().getRangeAt(0)
-      if (document.getSelection().toString().length) {
-        if (confirm('highlight?')) {
-          self.selectArray.push(self.rangeToObj(range))
-          document.designMode = 'on'
-          document.execCommand('HiliteColor', false, 'yellow')
-          document.designMode = 'off'
-        }
+      if (confirm('highlight?')) {
+        const highlighter = this.rangy.createHighlighter()
+        highlighter.addClassApplier(
+          rangy.createClassApplier('test', {
+            elementAttributes: {
+              'data-foo': 'Hello',
+              style: 'background-color: yellow',
+            },
+          })
+        )
+        highlighter.highlightSelection('test')
+        const serial = highlighter.serialize()
+        this.data.push(serial)
       }
     },
-    setSelection(rangeObj) {
-      this.data.forEach((each) => {
-        const selection = window.getSelection()
-        selection.addRange(this.objToRange(each))
-        document.designMode = 'on'
-        document.execCommand('HiliteColor', false, 'yellow')
-        document.designMode = 'off'
-        selection.removeAllRanges()
-      })
-    },
-    objToRange(rangeStr) {
-      const range = document.createRange()
-      range.setStart(
-        document.querySelector('[data-key="' + rangeStr.startKey + '"]')
-          .childNodes[rangeStr.startTextIndex],
-        rangeStr.startOffset
-      )
-      range.setEnd(
-        document.querySelector('[data-key="' + rangeStr.endKey + '"]')
-          .childNodes[rangeStr.endTextIndex],
-        rangeStr.endOffset
-      )
-      return range
-    },
-    rangeToObj(range) {
-      return {
-        startKey: range.startContainer.parentNode.dataset.key,
-        startTextIndex: Array.prototype.indexOf.call(
-          range.startContainer.parentNode.childNodes,
-          range.startContainer
-        ),
-        endKey: range.endContainer.parentNode.dataset.key,
-        endTextIndex: Array.prototype.indexOf.call(
-          range.endContainer.parentNode.childNodes,
-          range.endContainer
-        ),
-        startOffset: range.startOffset,
-        endOffset: range.endOffset,
-      }
-    },
-    addKey(element) {
-      if (element.children.length > 0) {
-        Array.from(element.children).forEach((child) => {
-          child.dataset.key = this.key++
-          this.addKey(child)
+    highlightOld() {
+      const highlighter = this.rangy.createHighlighter()
+      highlighter.addClassApplier(
+        rangy.createClassApplier('test', {
+          elementAttributes: {
+            'data-foo': 'Hello',
+            style: 'background-color: yellow',
+          },
         })
-      }
+      )
+      this.old.forEach((item) => {
+        highlighter.deserialize(item)
+      })
     },
   },
 }
