@@ -91,12 +91,14 @@ export default {
       this.highlightOld()
     },
     promptSelection() {
-      if (confirm('highlight?')) {
-        const highlighter = this.rangy.createHighlighter()
-        highlighter.addClassApplier(this.classApplier)
-        highlighter.highlightSelection('test')
-        const serial = highlighter.serialize()
-        this.data.push(serial)
+      if (document.getSelection().toString().length) {
+        if (confirm('highlight?')) {
+          const highlighter = this.rangy.createHighlighter()
+          highlighter.addClassApplier(this.classApplier)
+          highlighter.highlightSelection('test')
+          const serial = highlighter.serialize()
+          this.data.push(serial)
+        }
       }
     },
     highlightOld() {
