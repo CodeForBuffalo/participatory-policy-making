@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="relative">
     <b-container>
       <b-row>
         <b-col>
@@ -52,6 +52,7 @@
         </b-col>
       </b-row>
     </b-container>
+
     <b-sidebar
       v-model="sidebarIsOpen"
       aria-label="Sidebar"
@@ -66,6 +67,14 @@
         </div>
       </div>
     </b-sidebar>
+
+    <b-button
+      v-if="buttonActive"
+      class="position-absolute"
+      :style="`top: ${position.top}px; left: ${position.left}px; transform: translate(-50%, -100%)`"
+      @click="showCommentField"
+      >Hey</b-button
+    >
   </div>
 </template>
 
@@ -80,6 +89,11 @@ export default {
   name: 'Test2Page',
   data() {
     return {
+      buttonActive: false,
+      position: {
+        top: 0,
+        left: 0,
+      },
       data: [
         {
           id: 0,
@@ -112,6 +126,9 @@ export default {
     this.initRangy()
   },
   methods: {
+    showCommentField() {
+      console.log('Do something')
+    },
     toggleSidebar() {
       this.sidebarIsOpen = !this.sidebarIsOpen
     },
@@ -141,6 +158,14 @@ export default {
     promptSelection() {
       if (document.getSelection().toString().length) {
         this.rangy.getSelection().expand('word')
+        const selection = window.getSelection()
+        const getRange = selection.getRangeAt(0)
+        const selectionRect = getRange.getBoundingClientRect()
+        this.position = {
+          top: selectionRect.top - 12,
+          left: selectionRect.left + selectionRect.width / 2,
+        }
+        this.buttonActive = true
         if (confirm('highlight?')) {
           const highlighter = this.rangy.createHighlighter()
 
@@ -155,6 +180,12 @@ export default {
             range: highlighter.serialize(),
           })
         }
+      } else {
+        this.position = {
+          top: 0,
+          left: 0,
+        }
+        this.buttonActive = false
       }
     },
     setSelection() {
