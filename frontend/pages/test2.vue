@@ -133,8 +133,6 @@ export default {
       this.sidebarIsOpen = !this.sidebarIsOpen
     },
     annotationSelected(e) {
-      e.stopPropagation()
-
       const target = e.target
       this.activeId = target.getAttribute('data-annotation-id')
       this.toggleSidebar()
@@ -148,8 +146,10 @@ export default {
           style: 'background-color: yellow; cursor: pointer',
         },
         onElementCreate: (el) => {
-          el.addEventListener('click', (e) => {
-            this.annotationSelected(e)
+          ;['click', 'touchstart'].forEach((evt) => {
+            el.addEventListener(evt, (e) => {
+              this.annotationSelected(e)
+            })
           })
         },
       })
