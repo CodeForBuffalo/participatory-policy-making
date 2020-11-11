@@ -52,6 +52,20 @@
         </b-col>
       </b-row>
     </b-container>
+    <b-sidebar
+      v-model="sidebarIsOpen"
+      aria-label="Sidebar"
+      backdrop
+      shadow
+      right
+    >
+      <div v-if="activeComment" class="p-4">
+        <span class="font-weight-bold lead">"{{ activeComment.quote }}"</span>
+        <div>
+          <span>{{ activeComment.text }}</span>
+        </div>
+      </div>
+    </b-sidebar>
   </div>
 </template>
 
@@ -60,52 +74,96 @@ import rangy from 'rangy/lib/rangy-core.js'
 import 'rangy/lib/rangy-classapplier'
 import 'rangy/lib/rangy-highlighter'
 import 'rangy/lib/rangy-serializer'
+import 'rangy/lib/rangy-textrange'
 
 export default {
   name: 'Test2Page',
   data() {
     return {
-      data: [],
+      data: [
+        {
+          id: 0,
+          quote: 'sapien ullamcorper',
+          range: 'type:textContent|389$407$15$test$',
+          text: 'this is a great idea',
+        },
+        {
+          id: 1,
+          quote: 'libero sit amet quam egestas semper',
+          range: 'type:textContent|243$278$16$test$',
+          text: 'this is a bad idea',
+        },
+      ],
       rangy: null,
       highlighter: null,
       classApplier: null,
-      old: [
-        'type:textContent|259$304$7$test$',
-        'type:textContent|319$361$8$test$',
-      ],
+      activeId: null,
+      sidebarIsOpen: false,
     }
+  },
+  computed: {
+    activeComment() {
+      return this.data.find((item) => {
+        return item.id === Number(this.activeId)
+      })
+    },
   },
   mounted() {
     this.initRangy()
   },
   methods: {
+    toggleSidebar() {
+      this.sidebarIsOpen = !this.sidebarIsOpen
+    },
+    annotationSelected(e) {
+      e.stopPropagation()
+
+      const target = e.target
+      this.activeId = target.getAttribute('data-annotation-id')
+      this.toggleSidebar()
+    },
     initRangy() {
       this.rangy = rangy
       this.rangy.init()
       this.classApplier = this.rangy.createClassApplier('test', {
         elementAttributes: {
-          'data-foo': 'Hello',
-          style: 'background-color: yellow',
+          role: 'button',
+          style: 'background-color: yellow; cursor: pointer',
+        },
+        onElementCreate: (el) => {
+          el.addEventListener('click', (e) => {
+            this.annotationSelected(e)
+          })
         },
       })
-      this.highlightOld()
+      this.setSelection()
     },
     promptSelection() {
       if (document.getSelection().toString().length) {
+        this.rangy.getSelection().expand('word')
         if (confirm('highlight?')) {
           const highlighter = this.rangy.createHighlighter()
+
+          const quoteId = this.data.length + 1
+          this.classApplier.elementAttributes['data-annotation-id'] = quoteId
           highlighter.addClassApplier(this.classApplier)
           highlighter.highlightSelection('test')
-          const serial = highlighter.serialize()
-          this.data.push(serial)
+
+          this.data.push({
+            id: quoteId,
+            quote: this.rangy.getSelection().toString(),
+            range: highlighter.serialize(),
+          })
         }
       }
     },
-    highlightOld() {
+    setSelection() {
       const highlighter = this.rangy.createHighlighter()
-      highlighter.addClassApplier(this.classApplier)
-      this.old.forEach((item) => {
-        highlighter.deserialize(item)
+      const classApplier = this.classApplier
+      this.data.forEach((item) => {
+        classApplier.elementAttributes['data-annotation-id'] = item.id
+        highlighter.addClassApplier(classApplier)
+        highlighter.deserialize(item.range)
       })
     },
   },
