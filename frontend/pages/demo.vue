@@ -4,8 +4,8 @@
       <b-row>
         <b-col>
           <div
-            @mouseup="promptSelection()"
-            @touchend.prevent="promptSelection()"
+            @mouseup="(e) => showButton(e)"
+            @touchend="(e) => showButton(e)"
             v-html="$md.render(md.body)"
           />
         </b-col>
@@ -22,7 +22,7 @@
       <div v-if="activeComment" class="p-4">
         <span class="font-weight-bold lead">"{{ activeComment.quote }}"</span>
         <div>
-          <span>{{ activeComment.text }}</span>
+          <span>{{ activeComment.comment }}</span>
         </div>
       </div>
     </b-sidebar>
@@ -66,17 +66,16 @@ export default {
           id: 0,
           quote: 'that rental properties in the City',
           range: 'type:textContent|279$313$17$test$',
-          text: 'this is a great idea',
+          comment: 'this is a great idea',
         },
         {
           id: 1,
           quote: 'The legislation mirrors successful programs',
           range: 'type:textContent|718$761$18$test$',
-          text: 'this is a bad idea',
+          comment: 'this is a bad idea',
         },
       ],
       rangy: null,
-      highlighter: null,
       classApplier: null,
       activeId: null,
       sidebarIsOpen: false,
@@ -113,17 +112,16 @@ export default {
           style: 'background-color: yellow; cursor: pointer',
         },
         onElementCreate: (el) => {
-          ;['click', 'touchend'].forEach((evt) => {
-            el.addEventListener(evt, (e) => {
-              this.annotationSelected(e)
-            })
+          el.addEventListener('click', (e) => {
+            this.annotationSelected(e)
           })
         },
       })
       this.setSelection()
     },
-    promptSelection() {
+    showButton(e) {
       if (document.getSelection().toString().length) {
+        e.preventDefault()
         this.rangy.getSelection().expand('word')
         const selection = window.getSelection()
         const getRange = selection.getRangeAt(0)
@@ -133,7 +131,8 @@ export default {
           left: selectionRect.left + selectionRect.width / 2,
         }
         this.buttonActive = true
-        if (confirm('highlight?')) {
+        const comment = prompt('Please enter your comment:')
+        if (comment) {
           const highlighter = this.rangy.createHighlighter()
 
           const quoteId = this.data.length + 1
@@ -145,6 +144,7 @@ export default {
             id: quoteId,
             quote: this.rangy.getSelection().toString(),
             range: highlighter.serialize(),
+            comment,
           })
         }
         selection.removeAllRanges()
