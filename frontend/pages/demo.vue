@@ -27,13 +27,53 @@
       </div>
     </b-sidebar>
 
-    <b-button
-      v-if="buttonActive"
+    <div
+      id="commentBox"
       class="position-absolute"
       :style="`top: ${position.top}px; left: ${position.left}px; transform: translate(-50%, -100%)`"
-      @click="showCommentField"
-      >Hey</b-button
     >
+      <b-button v-show="buttonActive" id="popover-reactive-1">Hey</b-button>
+      <b-popover
+        ref="popover"
+        target="popover-reactive-1"
+        triggers="click"
+        :show.sync="popoverShow"
+        placement="auto"
+        container="commentBox"
+        custom-class="max-w-none w-400"
+      >
+        <template #title>
+          <b-button class="close" aria-label="Close" @click="closePopover()">
+            <span class="d-inline-block" aria-hidden="true">&times;</span>
+          </b-button>
+          Add Comment
+        </template>
+
+        <div>
+          <b-form-group label-for="popover-input-1" class="mb-1">
+            <b-form-textarea
+              id="popover-input-1"
+              ref="comment"
+              v-model="comment"
+              size="sm"
+            ></b-form-textarea>
+          </b-form-group>
+
+          <div class="d-flex justify-content-end">
+            <b-button
+              size="sm"
+              variant="danger"
+              class="mr-1"
+              @click="onCancel()"
+              >Cancel</b-button
+            >
+            <b-button size="sm" variant="primary" @click="onOk()"
+              >Submit</b-button
+            >
+          </div>
+        </div>
+      </b-popover>
+    </div>
   </div>
 </template>
 
@@ -61,6 +101,7 @@ export default {
         top: 0,
         left: 0,
       },
+      comment: '',
       data: [
         {
           id: 0,
@@ -79,6 +120,7 @@ export default {
       classApplier: null,
       activeId: null,
       sidebarIsOpen: false,
+      popoverShow: false,
     }
   },
   computed: {
@@ -92,6 +134,15 @@ export default {
     this.initRangy()
   },
   methods: {
+    onOk() {
+      this.closePopover()
+    },
+    onCancel() {
+      this.closePopover()
+    },
+    closePopover() {
+      this.popoverShow = false
+    },
     showCommentField() {
       console.log('Do something')
     },
@@ -168,3 +219,12 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.max-w-none {
+  max-width: none !important;
+}
+.w-400 {
+  width: 400px;
+}
+</style>
