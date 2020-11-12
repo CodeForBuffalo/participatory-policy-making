@@ -32,7 +32,9 @@
       class="position-absolute"
       :style="`top: ${position.top}px; left: ${position.left}px; transform: translate(-50%, -100%)`"
     >
-      <b-button v-show="buttonActive" id="popover-reactive-1">Hey</b-button>
+      <b-button v-show="buttonActive" id="popover-reactive-1">
+        <b-icon icon="chat-square-text-fill" aria-hidden="true" />
+      </b-button>
       <b-popover
         ref="popover"
         target="popover-reactive-1"
@@ -84,9 +86,16 @@ import 'rangy/lib/rangy-classapplier'
 import 'rangy/lib/rangy-highlighter'
 import 'rangy/lib/rangy-serializer'
 import 'rangy/lib/rangy-textrange'
+import { BIcon, BIconChatSquareTextFill } from 'bootstrap-vue'
 
 export default {
   name: 'DemoPage',
+  components: {
+    BIcon,
+    /* eslint-disable vue/no-unused-components */
+    BIconChatSquareTextFill,
+    /* eslint-enable vue/no-unused-components */
+  },
   asyncData({ $axios, route, error, $config }) {
     return $axios.$get(`/content/rental_inspection.md`).then((res) => {
       return {
