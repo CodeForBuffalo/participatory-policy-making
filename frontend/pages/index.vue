@@ -46,15 +46,11 @@ import marked from 'marked'
 export default {
   name: 'Home',
   asyncData({ $axios, route, error, $config }) {
-    return $axios
-      .$get(
-        `https://raw.githubusercontent.com/IHIutch/bufgreencode_v2/master/content/sections/access-parking/bicycle-access-and-parking.md`
-      )
-      .then((res) => {
-        return {
-          md: fm(res),
-        }
-      })
+    return $axios.$get(`/content/rental_inspection.md`).then((res) => {
+      return {
+        md: fm(res),
+      }
+    })
   },
   data() {
     return {
@@ -63,17 +59,17 @@ export default {
       sidebarIsOpen: false,
       existing: [
         {
-          id: 1,
-          text: 'this is a loaded annotation',
+          id: 0,
+          text: 'This is a test',
           ranges: [
             {
-              start: '/ol[1]/li[2]',
-              startOffset: 277,
-              end: '/ol[1]/li[2]',
-              endOffset: 315,
+              start: '/ol[1]/li[1]',
+              startOffset: 24,
+              end: '/ol[1]/li[1]',
+              endOffset: 42,
             },
           ],
-          quote: 'The required minimum number of spaces',
+          quote: 'double non-owner o',
         },
       ],
     }
