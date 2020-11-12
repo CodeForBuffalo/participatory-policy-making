@@ -233,6 +233,7 @@ export default {
 .max-w-none {
   max-width: none !important;
 }
+
 .w-400 {
   width: 400px;
 }
