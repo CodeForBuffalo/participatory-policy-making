@@ -6,6 +6,7 @@
           <div
             @mouseup="(e) => showButton(e)"
             @touchend="(e) => showButton(e)"
+            @contextmenu.prevent=""
             v-html="$md.render(md.body)"
           />
         </b-col>
