@@ -4,9 +4,8 @@
       <b-row>
         <b-col>
           <div
-            @mouseup="(e) => showButton(e)"
-            @touchend="(e) => showButton(e)"
-            @contextmenu.prevent=""
+            @mouseup="showButton()"
+            @contextmenu.prevent="showButton()"
             v-html="$md.render(md.body)"
           />
         </b-col>
@@ -181,9 +180,8 @@ export default {
       }
       this.buttonActive = false
     },
-    showButton(e) {
+    showButton() {
       if (document.getSelection().toString().length) {
-        e.preventDefault()
         this.rangy.getSelection().expand('word')
         const selection = window.getSelection()
         const getRange = selection.getRangeAt(0)
