@@ -87,7 +87,12 @@
 
         <div v-else class="p-4">
           <form @submit.prevent="createHighlight()">
-            <b-form-group label-for="newHighlightComment" class="mb-1">
+            <b-form-group
+              label="Add New Comment"
+              label-for="newHighlightComment"
+              label-class="font-weight-bold mb-1"
+              class="mb-2"
+            >
               <b-form-textarea
                 id="newHighlightComment"
                 v-model="newHighlight.comment"
@@ -95,7 +100,9 @@
                 rows="6"
               ></b-form-textarea>
             </b-form-group>
-            <b-button type="submit">Add Comment</b-button>
+            <b-button variant="primary" size="sm" type="submit"
+              >Add New Comment</b-button
+            >
           </form>
         </div>
       </div>
