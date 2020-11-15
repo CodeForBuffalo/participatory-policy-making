@@ -33,22 +33,54 @@
               >
             </div>
           </div>
-          <div class="border-bottom pb-2 px-4">
-            <div class="mb-2">
-              <div class="d-flex" style="line-height: 0.75">
-                <i class="font-weight-bold">{{ selectedHighlight.author }}</i>
+          <div class="pb-3">
+            <div class="px-4">
+              <div class="mb-2">
+                <div class="d-flex" style="line-height: 0.75">
+                  <i class="font-weight-bold">{{ selectedHighlight.author }}</i>
+                </div>
+                <span class="small text-muted">
+                  {{
+                    selectedHighlight.onCreated | date('MMM DD, YYYY, hh:mmA')
+                  }}
+                </span>
               </div>
-              <span class="small text-muted">
-                {{ selectedHighlight.onCreated | date('MMM DD, YYYY, hh:mmA') }}
-              </span>
-            </div>
-            <div class="d-flex">
-              <span>{{ selectedHighlight.comment }}</span>
+              <div class="d-flex">
+                <span>{{ selectedHighlight.comment }}</span>
+              </div>
             </div>
             <div>
-              <b-button variant="link" class="shadow-none px-0" size="sm">
-                Reply
-              </b-button>
+              <div class="px-4 border-bottom pb-2">
+                <b-button
+                  v-b-toggle.collapseComment
+                  variant="link"
+                  class="shadow-none px-0"
+                  size="sm"
+                >
+                  Reply
+                </b-button>
+              </div>
+              <b-collapse id="collapseComment" class="px-4 border-bottom">
+                <form class="py-3" @submit.prevent="">
+                  <b-form-group
+                    label="Add Reply"
+                    label-for="commentReply"
+                    label-class="font-weight-bold mb-1"
+                    class="mb-2"
+                  >
+                    <b-form-textarea
+                      id="commentReply"
+                      placeholder="Enter your comment"
+                      size="sm"
+                      rows="4"
+                      no-resize
+                    ></b-form-textarea>
+                  </b-form-group>
+                  <b-button variant="primary" size="sm" type="submit"
+                    >Add Reply</b-button
+                  >
+                </form>
+              </b-collapse>
             </div>
           </div>
         </div>
@@ -60,6 +92,7 @@
                 id="newHighlightComment"
                 v-model="newHighlight.comment"
                 size="sm"
+                rows="6"
               ></b-form-textarea>
             </b-form-group>
             <b-button type="submit">Add Comment</b-button>
