@@ -5,7 +5,7 @@
         <b-col>
           <div
             @mouseup="showButton()"
-            @contextmenu.prevent="showButton()"
+            @contextmenu.prevent=""
             v-html="$md.render(md.body)"
           />
         </b-col>
@@ -114,14 +114,54 @@ export default {
       activeComment: null,
     }
   },
-  computed: {},
+  computed: {
+    isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      )
+    },
+  },
   mounted() {
+    if (process.env.NODE_ENV !== 'production') {
+      this.debug()
+    }
     this.initRangy()
+    if (this.isMobileDevice) {
+      this.initSelectionChangeListener()
+    }
   },
   methods: {
+    debug() {
+      const events = [
+        'touchstart',
+        'touchend',
+        'mousedown',
+        'mouseup',
+        'selectionchange',
+        'selectionchanged',
+        'selectstart',
+      ]
+
+      const counts = events.reduce((counts, name) => {
+        counts[name] = 0
+        return counts
+      }, {})
+
+      events.forEach((name) => {
+        document.addEventListener(name, () => {
+          ++counts[name]
+          console.log('%s triggered. count: %d', name, counts[name])
+        })
+      })
+    },
+    initSelectionChangeListener() {
+      document.addEventListener('selectionchange', (e) => {
+        this.showButton()
+      })
+    },
     addComment() {
       this.activeSelection = this.rangy.saveSelection()
-      const selection = window.getSelection()
+      const selection = document.getSelection()
       selection.removeAllRanges()
       this.toggleSidebar()
       this.activeComment = null
@@ -169,7 +209,7 @@ export default {
         range: highlighter.serialize(),
         comment: this.comment,
       })
-      const selection = window.getSelection()
+      const selection = document.getSelection()
       selection.removeAllRanges()
       this.toggleSidebar()
     },
@@ -182,8 +222,8 @@ export default {
     },
     showButton() {
       if (document.getSelection().toString().length) {
-        this.rangy.getSelection().expand('word')
-        const selection = window.getSelection()
+        // this.rangy.getSelection().expand('word')
+        const selection = document.getSelection()
         const getRange = selection.getRangeAt(0)
         const selectionRect = getRange.getBoundingClientRect()
         this.position = {
