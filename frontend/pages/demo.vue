@@ -2,7 +2,7 @@
   <div class="relative">
     <b-container>
       <b-row>
-        <b-col>
+        <b-col offset-lg="2" lg="8">
           <Annotator
             ref="annotator"
             :highlights.sync="highlights"
@@ -17,23 +17,43 @@
 
     <b-sidebar
       v-model="sidebarIsOpen"
+      bg-variant="white"
       aria-label="Sidebar"
       backdrop
       shadow
       right
       @hidden="unsetSelectedHighlight()"
     >
-      <div class="p-4">
+      <div>
         <div v-if="selectedHighlight.uid">
-          <span class="font-weight-bold lead"
-            >"{{ selectedHighlight.quote }}"</span
-          >
-          <div>
-            <span>{{ selectedHighlight.comment }}</span>
+          <div class="p-4">
+            <div class="p-2 bg-light rounded border">
+              <span class="font-weight-bold lead d-flex"
+                >"{{ selectedHighlight.quote }}"</span
+              >
+            </div>
+          </div>
+          <div class="border-bottom pb-2 px-4">
+            <div class="mb-2">
+              <div class="d-flex" style="line-height: 0.75">
+                <i class="font-weight-bold">{{ selectedHighlight.author }}</i>
+              </div>
+              <span class="small text-muted">
+                {{ selectedHighlight.onCreated | date('MMM DD, YYYY, hh:mmA') }}
+              </span>
+            </div>
+            <div class="d-flex">
+              <span>{{ selectedHighlight.comment }}</span>
+            </div>
+            <div>
+              <b-button variant="link" class="shadow-none px-0" size="sm">
+                Reply
+              </b-button>
+            </div>
           </div>
         </div>
 
-        <div v-else>
+        <div v-else class="p-4">
           <form @submit.prevent="createHighlight()">
             <b-form-group label-for="newHighlightComment" class="mb-1">
               <b-form-textarea
@@ -53,11 +73,17 @@
 <script>
 import Annotator from '@/components/Annotator'
 import fm from 'front-matter'
+import dayjs from 'dayjs'
 
 export default {
   name: 'DemoPage',
   components: {
     Annotator,
+  },
+  filters: {
+    date(val, format = 'MMM DD, YYYY, hh:mmA') {
+      return dayjs(val).format(format)
+    },
   },
   asyncData({ $axios, route, error, $config }) {
     return $axios.$get(`/content/rental_inspection.md`).then((res) => {
@@ -74,12 +100,14 @@ export default {
           quote: 'that rental properties in the City',
           range: 'type:textContent|279$313$17$default$',
           comment: 'this is a great idea',
+          author: 'Anonymous',
         },
         {
           uid: '1',
           quote: 'The legislation mirrors successful programs',
           range: 'type:textContent|718$761$18$default$',
           comment: 'this is a bad idea',
+          author: 'Anonymous',
         },
       ],
       newHighlight: {

@@ -93,10 +93,12 @@ export default {
       highlighter.highlightSelection('default')
 
       this.highlights.push({
+        author: 'Anonymous',
         uid,
         quote: this.rangy.getSelection().toString(),
         range: highlighter.serialize(),
         comment,
+        createdOn: new Date(),
       })
       const selection = document.getSelection()
       selection.removeAllRanges()
