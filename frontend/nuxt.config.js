@@ -34,13 +34,8 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/markdownit',
-    [
-      '@nuxtjs/google-gtag',
-      {
-        id: 'G-ES5BRWWS9D',
-        debug: false, // Enable to track in development
-      },
-    ],
+    '@nuxtjs/google-gtag',
+    '@nuxtjs/sentry',
   ],
   markdownit: {
     injected: true,
@@ -65,4 +60,13 @@ export default {
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {},
+  'google-gtag': {
+    id: 'G-ES5BRWWS9D',
+    debug: false, // Enable to track in development
+  },
+  sentry: {
+    initialize: process.env.NODE_ENV === 'production',
+    dsn:
+      'https://f93b0eb90ee54957a1cc5f1c43396be8@o311837.ingest.sentry.io/5519232',
+  },
 }
