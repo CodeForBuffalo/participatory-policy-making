@@ -177,5 +177,10 @@ export default {
       this.selectedHighlight = {}
     },
   },
+  head() {
+    return {
+      title: 'Demo',
+    }
+  },
 }
 </script>

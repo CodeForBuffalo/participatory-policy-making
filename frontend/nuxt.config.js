@@ -34,6 +34,13 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/markdownit',
+    [
+      '@nuxtjs/google-gtag',
+      {
+        id: 'G-ES5BRWWS9D',
+        debug: false, // Enable to track in development
+      },
+    ],
   ],
   markdownit: {
     injected: true,
