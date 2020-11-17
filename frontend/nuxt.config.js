@@ -63,6 +63,9 @@ export default {
   'google-gtag': {
     id: 'G-ES5BRWWS9D',
     debug: false, // Enable to track in development
+    config: {
+      send_page_view: false, // might be necessary to avoid duplicated page track on page reload
+    },
   },
   sentry: {
     initialize: process.env.NODE_ENV === 'production',
