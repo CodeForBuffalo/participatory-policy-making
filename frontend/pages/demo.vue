@@ -3,6 +3,27 @@
     <b-container>
       <b-row>
         <b-col offset-lg="2" lg="8">
+          <b-form-group>
+            <b-form-radio-group
+              id="supportToggle"
+              v-model="support.value"
+              buttons
+              button-variant="outline-secondary"
+              class="w-100"
+              @input="toggleLiked()"
+            >
+              <b-form-radio
+                v-for="(option, idx) in support.options"
+                :key="idx"
+                :value="option.value"
+                class="w-100"
+              >
+                {{ option.text }}
+              </b-form-radio>
+            </b-form-radio-group>
+          </b-form-group>
+        </b-col>
+        <b-col offset-lg="2" lg="8">
           <Annotator
             ref="annotator"
             :highlights.sync="highlights"
@@ -134,6 +155,13 @@ export default {
   },
   data() {
     return {
+      support: {
+        value: null,
+        options: [
+          { text: 'I Support This', value: true },
+          { text: 'I Do Not Support This', value: false },
+        ],
+      },
       highlights: [
         {
           uid: '0',
@@ -157,7 +185,17 @@ export default {
       sidebarIsOpen: false,
     }
   },
+  mounted() {
+    if (localStorage.getItem('liked')) {
+      const value = JSON.parse(localStorage.getItem('liked')).value
+      this.support.value = value
+    }
+  },
   methods: {
+    toggleLiked() {
+      const parsed = JSON.stringify({ value: this.support.value })
+      localStorage.setItem('liked', parsed)
+    },
     showHighlightComment(e) {
       this.selectedHighlight = e
       this.toggleSidebar()

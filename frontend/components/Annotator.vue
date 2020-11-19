@@ -74,6 +74,7 @@ export default {
       const selection = document.getSelection()
       selection.removeAllRanges()
       this.hideButton()
+      // TO DO: Send quoted text
       this.$emit('onSelectionStored')
     },
     highlightSelected(e) {
