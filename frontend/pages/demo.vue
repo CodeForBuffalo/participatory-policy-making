@@ -87,7 +87,10 @@
                 />
               </b-collapse>
               <div>
-                <CommentThread :comments="activeComments" />
+                <CommentThread
+                  :parent-uid="selectedHighlight.uid"
+                  :comments.sync="comments"
+                />
               </div>
             </div>
           </div>
@@ -122,13 +125,16 @@
 import Annotator from '@/components/Annotator'
 import fm from 'front-matter'
 import dayjs from 'dayjs'
-import CommentBox from '../components/CommentBox.vue'
+import { v4 as uuidv4 } from 'uuid'
+import CommentBox from '../components/CommentBox'
+import CommentThread from '../components/CommentThread'
 
 export default {
   name: 'DemoPage',
   components: {
     Annotator,
     CommentBox,
+    CommentThread,
   },
   filters: {
     date(val, format = 'MMM DD, YYYY, hh:mmA') {
@@ -184,7 +190,7 @@ export default {
   computed: {
     activeComments() {
       return this.comments.filter((comment) => {
-        return comment.parentId === this.selectedHighlight.uid
+        return comment.parentUid === this.selectedHighlight.uid
       })
     },
   },
@@ -217,13 +223,14 @@ export default {
     unsetSelectedHighlight() {
       this.selectedHighlight = {}
     },
-    replyTo(e, parentId) {
+    replyTo(e, parentUid) {
       const { author, comment } = e
       this.comments.push({
-        parentId,
+        parentUid,
         author,
         comment,
         createdOn: dayjs().format(),
+        uid: uuidv4(),
       })
     },
   },
