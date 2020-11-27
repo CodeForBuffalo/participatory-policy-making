@@ -211,6 +211,10 @@ export default {
     },
     toggleSidebar() {
       this.sidebarIsOpen = !this.sidebarIsOpen
+
+      const body = document.getElementsByTagName('body')[0]
+      if (this.sidebarIsOpen) body.classList.add('overflow-hidden')
+      else body.classList.remove('overflow-hidden')
     },
     initNewHighlight() {
       this.toggleSidebar()
