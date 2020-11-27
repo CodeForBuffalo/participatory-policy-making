@@ -62,7 +62,7 @@
                 </div>
                 <span class="small text-muted">
                   {{
-                    selectedHighlight.onCreated | date('MMM DD, YYYY, hh:mmA')
+                    selectedHighlight.createdOn | date('MMM DD, YYYY, hh:mmA')
                   }}
                 </span>
               </div>
@@ -82,26 +82,13 @@
                 </b-button>
               </div>
               <b-collapse id="collapseComment" class="px-4 border-bottom">
-                <form class="py-3" @submit.prevent="">
-                  <b-form-group
-                    label="Add Reply"
-                    label-for="commentReply"
-                    label-class="font-weight-bold mb-1"
-                    class="mb-2"
-                  >
-                    <b-form-textarea
-                      id="commentReply"
-                      placeholder="Enter your comment"
-                      size="sm"
-                      rows="4"
-                      no-resize
-                    ></b-form-textarea>
-                  </b-form-group>
-                  <b-button variant="primary" size="sm" type="submit"
-                    >Add Reply</b-button
-                  >
-                </form>
+                <CommentBox
+                  @onSubmit="(e) => replyTo(e, selectedHighlight.uid)"
+                />
               </b-collapse>
+              <div>
+                <CommentThread :comments="activeComments" />
+              </div>
             </div>
           </div>
         </div>
@@ -135,11 +122,13 @@
 import Annotator from '@/components/Annotator'
 import fm from 'front-matter'
 import dayjs from 'dayjs'
+import CommentBox from '../components/CommentBox.vue'
 
 export default {
   name: 'DemoPage',
   components: {
     Annotator,
+    CommentBox,
   },
   filters: {
     date(val, format = 'MMM DD, YYYY, hh:mmA') {
@@ -169,6 +158,7 @@ export default {
           range: 'type:textContent|279$313$17$default$',
           comment: 'this is a great idea',
           author: 'Anonymous',
+          createdOn: '2020-12-12',
         },
         {
           uid: '1',
@@ -176,14 +166,27 @@ export default {
           range: 'type:textContent|718$761$18$default$',
           comment: 'this is a bad idea',
           author: 'Anonymous',
+          createdOn: '2020-12-13',
         },
       ],
       newHighlight: {
         comment: '',
       },
+      newComment: {
+        name: '',
+        comment: '',
+      },
       selectedHighlight: {},
       sidebarIsOpen: false,
+      comments: [],
     }
+  },
+  computed: {
+    activeComments() {
+      return this.comments.filter((comment) => {
+        return comment.parentId === this.selectedHighlight.uid
+      })
+    },
   },
   mounted() {
     if (localStorage.getItem('liked')) {
@@ -213,6 +216,15 @@ export default {
     },
     unsetSelectedHighlight() {
       this.selectedHighlight = {}
+    },
+    replyTo(e, parentId) {
+      const { author, comment } = e
+      this.comments.push({
+        parentId,
+        author,
+        comment,
+        createdOn: dayjs().format(),
+      })
     },
   },
   head() {
