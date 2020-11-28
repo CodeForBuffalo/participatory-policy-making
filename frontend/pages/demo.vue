@@ -69,7 +69,7 @@
                 </span>
               </div>
               <div class="d-flex">
-                <span>{{ selectedHighlight.comment }}</span>
+                <span>{{ selectedHighlight.text }}</span>
               </div>
             </div>
             <div>
@@ -96,13 +96,35 @@
           </div>
         </div>
 
-        <div v-else class="p-4">
-          <form @submit.prevent="createHighlight()">
+        <div v-else>
+          <div class="p-4 border-bottom">
+            <div class="p-2 bg-light rounded border">
+              <span class="font-weight-bold lead d-flex"
+                >"{{ newHighlight.quote }}"</span
+              >
+            </div>
+          </div>
+          <form class="p-4" @submit.prevent="createHighlight()">
+            <b-form-group
+              label="Your Name"
+              label-for="newHightlightAuthor"
+              label-class="font-weight-bold mb-1 py-0"
+              class="mb-2"
+              label-size="sm"
+            >
+              <b-form-input
+                id="newHightlightAuthor"
+                v-model="newHighlight.author"
+                type="text"
+                size="sm"
+              ></b-form-input>
+            </b-form-group>
             <b-form-group
               label="Add New Comment"
               label-for="newHighlightComment"
-              label-class="font-weight-bold mb-1"
+              label-class="font-weight-bold mb-1 py-0"
               class="mb-2"
+              label-size="sm"
             >
               <b-form-textarea
                 id="newHighlightComment"
@@ -157,14 +179,12 @@ export default {
         ],
       },
       newHighlight: {
-        range: '',
-        quote: '',
         author: '',
         text: '',
       },
       newComment: {
-        name: '',
-        comment: '',
+        author: '',
+        text: '',
       },
       selectedHighlight: {},
       sidebarIsOpen: false,

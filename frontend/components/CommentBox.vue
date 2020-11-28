@@ -10,7 +10,7 @@
       >
         <b-form-input
           :id="`name-${_uid}`"
-          v-model="form.name"
+          v-model="form.author"
           type="text"
           size="sm"
         ></b-form-input>
@@ -42,7 +42,7 @@ export default {
   data() {
     return {
       form: {
-        name: '',
+        author: '',
         text: '',
       },
     }
