@@ -71,39 +71,41 @@ export default {
   methods: {
     storeSelection() {
       this.savedSelection = this.rangy.saveSelection()
+      const quote = this.rangy.getSelection().toString()
       const selection = document.getSelection()
+
       selection.removeAllRanges()
       this.hideButton()
-      // TO DO: Send quoted text
-      this.$emit('onSelectionStored')
+
+      this.$emit('onSelectionStored', {
+        quote,
+      })
     },
     highlightSelected(e) {
       const target = e.target
       const uid = target.getAttribute('data-annotation-uid')
-      const selectedHighlight = this.highlights.find((item) => {
-        return item.uid === uid
+      const selectedHighlight = this.highlights.find((highlight) => {
+        return highlight.uid === uid
       })
       this.$emit('onHighlightSelected', selectedHighlight)
     },
-    createHighlight(comment) {
-      const highlighter = this.rangy.createHighlighter()
+    createHighlight(highlight) {
       const uid = uuidv4()
+      const highlighter = this.rangy.createHighlighter()
       this.classApplier.elementAttributes['data-annotation-uid'] = uid
       this.rangy.restoreSelection(this.savedSelection)
       highlighter.addClassApplier(this.classApplier)
       highlighter.highlightSelection('default')
 
-      this.highlights.push({
-        author: 'Anonymous',
+      this.$store.commit('annotateState/createComment', {
+        ...highlight,
         uid,
-        quote: this.rangy.getSelection().toString(),
         range: highlighter.serialize(),
-        comment,
-        createdAt: new Date(),
+        isHighlight: true,
       })
+
       const selection = document.getSelection()
       selection.removeAllRanges()
-      this.$emit('update:highlights', this.highlights)
     },
     debug() {
       const events = [

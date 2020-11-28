@@ -28,16 +28,27 @@ const state = () => {
 }
 
 const mutations = {
-  createComment(state, { author, text, replyToUid, quote, range }) {
+  createComment(
+    state,
+    {
+      uid = uuidv4(),
+      author = null,
+      text = null,
+      replyToUid = null,
+      quote = null,
+      range = null,
+      isHighlight = false,
+    }
+  ) {
     state.comments.push({
-      uid: uuidv4(),
+      uid,
       text,
-      quote: quote || null,
-      range: range || null,
+      quote,
+      range,
       author,
-      documentId: state.documentId,
       replyToUid,
-      isHighlight: false,
+      isHighlight,
+      documentId: state.documentId,
       createdAt: dayjs().format(),
     })
   },

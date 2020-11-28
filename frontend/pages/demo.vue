@@ -29,7 +29,7 @@
               ref="annotator"
               :highlights.sync="highlights"
               @onHighlightSelected="(e) => showHighlightComment(e)"
-              @onSelectionStored="() => initNewHighlight()"
+              @onSelectionStored="(e) => initNewHighlight(e)"
             >
               <div v-html="$md.render(md.body)" />
             </Annotator>
@@ -106,7 +106,7 @@
             >
               <b-form-textarea
                 id="newHighlightComment"
-                v-model="newHighlight.comment"
+                v-model="newHighlight.text"
                 size="sm"
                 rows="6"
               ></b-form-textarea>
@@ -157,7 +157,10 @@ export default {
         ],
       },
       newHighlight: {
-        comment: '',
+        range: '',
+        quote: '',
+        author: '',
+        text: '',
       },
       newComment: {
         name: '',
@@ -204,12 +207,14 @@ export default {
       if (this.sidebarIsOpen) body.classList.add('overflow-hidden')
       else body.classList.remove('overflow-hidden')
     },
-    initNewHighlight() {
-      this.toggleSidebar()
-    },
-    createHighlight() {
-      this.$refs.annotator.createHighlight(this.newHighlight.comment)
-      this.newHighlight.text = ''
+    initNewHighlight(e) {
+      const { range, quote } = e
+      this.newHighlight = {
+        range,
+        quote,
+        author: '',
+        text: '',
+      }
       this.toggleSidebar()
     },
     unsetSelectedHighlight() {
@@ -223,6 +228,11 @@ export default {
         text,
         replyToUid,
       })
+    },
+    createHighlight() {
+      this.$refs.annotator.createHighlight(this.newHighlight)
+      this.newHighlight = {}
+      this.toggleSidebar()
     },
   },
   head() {
