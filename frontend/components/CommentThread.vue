@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="(comment, idx) in comments" :key="idx">
-      <template v-if="comment.parentUid === parentUid">
+      <template v-if="comment.replyToUid === replyToUid">
         <div class="px-4 pt-3 border-bottom">
           <div class="mb-2">
             <div class="d-flex" style="line-height: 0.75">
@@ -10,11 +10,11 @@
               }}</i>
             </div>
             <span class="small text-muted">
-              {{ comment.createdOn | date('MMM DD, YYYY, hh:mmA') }}
+              {{ comment.createdAt | date('MMM DD, YYYY, hh:mmA') }}
             </span>
           </div>
           <div class="d-flex">
-            <span>{{ comment.comment }}</span>
+            <span>{{ comment.text }}</span>
           </div>
           <div class="pb-2">
             <b-button
@@ -32,7 +32,7 @@
           class="pl-2 border-bottom bg-secondary"
         >
           <div class="px-4 bg-white">
-            <CommentBox @onSubmit="(e) => replyTo(e, comment.uid)" />
+            <CommentBox @onSubmit="(e) => createComment(e, comment.uid)" />
           </div>
         </b-collapse>
         <div class="pl-2 bg-secondary">
@@ -48,11 +48,11 @@
                 }}</i>
               </div>
               <span class="small text-muted">
-                {{ nested.createdOn | date('MMM DD, YYYY, hh:mmA') }}
+                {{ nested.createdAt | date('MMM DD, YYYY, hh:mmA') }}
               </span>
             </div>
             <div class="d-flex">
-              <span>{{ nested.comment }}</span>
+              <span>{{ nested.text }}</span>
             </div>
           </div>
         </div>
@@ -63,7 +63,6 @@
 
 <script>
 import dayjs from 'dayjs'
-import { v4 as uuidv4 } from 'uuid'
 import CommentBox from './CommentBox.vue'
 
 export default {
@@ -79,26 +78,23 @@ export default {
       type: Array,
       required: true,
     },
-    parentUid: {
+    replyToUid: {
       type: String,
       required: true,
     },
   },
   methods: {
-    replyTo(e, parentUid) {
-      console.log(parentUid)
-      const { author, comment } = e
-      this.comments.push({
-        parentUid,
+    createComment(e, replyToUid) {
+      const { author, text } = e
+      this.$store.commit('annotateState/createComment', {
         author,
-        comment,
-        createdOn: dayjs().format(),
-        uid: uuidv4(),
+        text,
+        replyToUid,
       })
     },
-    nestedComments(parentUid) {
+    nestedComments(replyToUid) {
       return this.comments.filter((comment) => {
-        return comment.parentUid === parentUid
+        return comment.replyToUid === replyToUid
       })
     },
   },

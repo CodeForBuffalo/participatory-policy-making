@@ -99,7 +99,7 @@ export default {
         quote: this.rangy.getSelection().toString(),
         range: highlighter.serialize(),
         comment,
-        createdOn: new Date(),
+        createdAt: new Date(),
       })
       const selection = document.getSelection()
       selection.removeAllRanges()

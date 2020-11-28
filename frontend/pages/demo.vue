@@ -24,14 +24,16 @@
           </b-form-group>
         </b-col>
         <b-col offset-lg="2" lg="8">
-          <Annotator
-            ref="annotator"
-            :highlights.sync="highlights"
-            @onHighlightSelected="(e) => showHighlightComment(e)"
-            @onSelectionStored="() => initNewHighlight()"
-          >
-            <div v-html="$md.render(md.body)" />
-          </Annotator>
+          <client-only>
+            <Annotator
+              ref="annotator"
+              :highlights.sync="highlights"
+              @onHighlightSelected="(e) => showHighlightComment(e)"
+              @onSelectionStored="() => initNewHighlight()"
+            >
+              <div v-html="$md.render(md.body)" />
+            </Annotator>
+          </client-only>
         </b-col>
       </b-row>
     </b-container>
@@ -62,7 +64,7 @@
                 </div>
                 <span class="small text-muted">
                   {{
-                    selectedHighlight.createdOn | date('MMM DD, YYYY, hh:mmA')
+                    selectedHighlight.createdAt | date('MMM DD, YYYY, hh:mmA')
                   }}
                 </span>
               </div>
@@ -82,14 +84,12 @@
                 </b-button>
               </div>
               <b-collapse id="collapseComment" class="px-4 border-bottom">
-                <CommentBox
-                  @onSubmit="(e) => replyTo(e, selectedHighlight.uid)"
-                />
+                <CommentBox @onSubmit="(e) => createComment(e)" />
               </b-collapse>
               <div>
                 <CommentThread
-                  :parent-uid="selectedHighlight.uid"
-                  :comments.sync="comments"
+                  :reply-to-uid="selectedHighlight.uid"
+                  :comments="comments"
                 />
               </div>
             </div>
@@ -125,7 +125,6 @@
 import Annotator from '@/components/Annotator'
 import fm from 'front-matter'
 import dayjs from 'dayjs'
-import { v4 as uuidv4 } from 'uuid'
 import CommentBox from '../components/CommentBox'
 import CommentThread from '../components/CommentThread'
 
@@ -157,24 +156,6 @@ export default {
           { text: 'I Do Not Support This', value: false },
         ],
       },
-      highlights: [
-        {
-          uid: '0',
-          quote: 'that rental properties in the City',
-          range: 'type:textContent|279$313$17$default$',
-          comment: 'this is a great idea',
-          author: 'Anonymous',
-          createdOn: '2020-12-12',
-        },
-        {
-          uid: '1',
-          quote: 'The legislation mirrors successful programs',
-          range: 'type:textContent|718$761$18$default$',
-          comment: 'this is a bad idea',
-          author: 'Anonymous',
-          createdOn: '2020-12-13',
-        },
-      ],
       newHighlight: {
         comment: '',
       },
@@ -184,14 +165,21 @@ export default {
       },
       selectedHighlight: {},
       sidebarIsOpen: false,
-      comments: [],
     }
   },
   computed: {
     activeComments() {
       return this.comments.filter((comment) => {
-        return comment.parentUid === this.selectedHighlight.uid
+        return comment.replyToUid === this.selectedHighlight.uid
       })
+    },
+    highlights() {
+      return this.$store.state.annotateState.comments.filter((comment) => {
+        return comment.isHighlight === true
+      })
+    },
+    comments() {
+      return this.$store.state.annotateState.comments
     },
   },
   mounted() {
@@ -221,20 +209,19 @@ export default {
     },
     createHighlight() {
       this.$refs.annotator.createHighlight(this.newHighlight.comment)
-      this.newHighlight.comment = ''
+      this.newHighlight.text = ''
       this.toggleSidebar()
     },
     unsetSelectedHighlight() {
       this.selectedHighlight = {}
     },
-    replyTo(e, parentUid) {
-      const { author, comment } = e
-      this.comments.push({
-        parentUid,
+    createComment(e) {
+      const { author, text } = e
+      const replyToUid = this.selectedHighlight.uid
+      this.$store.commit('annotateState/createComment', {
         author,
-        comment,
-        createdOn: dayjs().format(),
-        uid: uuidv4(),
+        text,
+        replyToUid,
       })
     },
   },
