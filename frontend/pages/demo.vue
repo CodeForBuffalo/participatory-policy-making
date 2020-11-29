@@ -9,16 +9,16 @@
               buttons
               button-variant="outline-secondary"
               class="w-100"
-              :checked="userLiked"
-              @input="(value) => toggleLiked(value)"
+              :checked="
+                userVote.didSupport == null ? null : userVote.didSupport
+              "
+              @input="(value) => toggleVote(value)"
             >
-              <b-form-radio
-                v-for="(option, idx) in support.options"
-                :key="idx"
-                :value="option.value"
-                class="w-100"
-              >
-                {{ option.text }}
+              <b-form-radio :value="true" class="w-100">
+                I Support This. Votes: {{ votes.likes.length }}
+              </b-form-radio>
+              <b-form-radio :value="false" class="w-100">
+                I Do Not Support This. Votes: {{ votes.dislikes.length }}
               </b-form-radio>
             </b-form-radio-group>
           </b-form-group>
@@ -172,12 +172,6 @@ export default {
   },
   data() {
     return {
-      support: {
-        options: [
-          { text: 'I Support This', value: true },
-          { text: 'I Do Not Support This', value: false },
-        ],
-      },
       newHighlight: {
         author: '',
         text: '',
@@ -199,20 +193,27 @@ export default {
     comments() {
       return this.$store.state.annotateState.comments
     },
-    userLiked() {
-      return this.$store.state.annotateState.userLiked
+    userVote() {
+      return this.$store.state.annotateState.userVote
     },
-    likes() {
-      return this.$store.state.annotateState.likes
+    votes() {
+      const votes = this.$store.state.annotateState.votes
+      return votes.reduce(
+        (acc, vote) => {
+          acc[vote.didSupport ? 'likes' : 'dislikes'].push(vote)
+          return acc
+        },
+        { likes: [], dislikes: [] }
+      )
     },
   },
   mounted() {
-    this.$store.commit('annotateState/getUserLiked')
+    this.$store.commit('annotateState/getUserVote')
   },
   methods: {
-    toggleLiked(value) {
-      if (this.userLiked !== value) {
-        this.$store.commit('annotateState/postLike', value)
+    toggleVote(value) {
+      if (this.userVote.didSupport !== value) {
+        this.$store.commit('annotateState/postVote', value)
       }
     },
     showHighlightComment(e) {
