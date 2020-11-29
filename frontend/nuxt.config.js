@@ -1,4 +1,13 @@
+const apiURL = 'https://someapiurl.com'
+const baseURL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://participatory-policy-making.herokuapp.com'
+    : 'http://localhost:3000'
+
 export default {
+  publicRuntimeConfig: {
+    baseURL,
+  },
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
     title: 'frontend',
@@ -33,10 +42,19 @@ export default {
     'bootstrap-vue/nuxt',
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/proxy',
     '@nuxtjs/markdownit',
     '@nuxtjs/google-gtag',
     '@nuxtjs/sentry',
   ],
+  proxy: {
+    '/api': {
+      target: apiURL,
+      // onProxyReq(proxyReq) {
+      //   console.log(proxyReq.path)
+      // },
+    },
+  },
   markdownit: {
     injected: true,
     use: [
@@ -56,7 +74,9 @@ export default {
   },
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  axios: {},
+  axios: {
+    proxy: true,
+  },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {},

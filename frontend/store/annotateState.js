@@ -3,36 +3,22 @@ import { v4 as uuidv4 } from 'uuid'
 
 const state = () => {
   return {
-    documentId: 1234,
+    documentId: null,
     comments: [],
-    votes: [
-      {
-        id: 0,
-        createdAt: '2020-12-12',
-        didSupport: true,
-        uid: '1234',
-      },
-      {
-        id: 1,
-        createdAt: '2020-12-13',
-        didSupport: false,
-        uid: '1235',
-      },
-      {
-        id: 2,
-        createdAt: '2020-12-13',
-        didSupport: false,
-        uid: '1236',
-      },
-      { didSupport: false, uid: 'f1713e9c-452e-4217-8721-1ef390bb389b' },
-    ],
+    votes: [],
     userVote: {},
   }
 }
 
 const mutations = {
+  initState(state, { comments = [], votes = [], documentId }) {
+    state.comments = comments
+    state.votes = votes
+    state.documentId = documentId
+  },
   getVotes(state) {
-    state.votes = []
+    // TODO: Get votes
+    // state.votes = []
   },
   getUserVote(state) {
     if (localStorage.getItem(state.documentId)) {
@@ -47,6 +33,7 @@ const mutations = {
       state.votes.push(state.userVote)
       localStorage.setItem(state.documentId, stringified)
       // TODO: Create vote
+      // this.$axios.$post('api/v1/votes', state.userVote)
     } else {
       const existingVote = state.votes.find((vote) => {
         return vote.uid === state.userVote.uid
@@ -56,29 +43,12 @@ const mutations = {
       const stringified = JSON.stringify(state.userVote)
       localStorage.setItem(state.documentId, stringified)
       // TODO: Update vote
+      // this.$axios.$post('api/v1/votes', state.userVote)
     }
   },
   getComments(state) {
-    state.comments = [
-      {
-        uid: '0',
-        quote: 'that rental properties in the City',
-        range: 'type:textContent|279$313$17$default$',
-        text: 'this is a great idea',
-        author: 'Anonymous',
-        createdAt: '2020-12-12',
-        isHighlight: true,
-      },
-      {
-        uid: '1',
-        quote: 'The legislation mirrors successful programs',
-        range: 'type:textContent|718$761$18$default$',
-        text: 'this is a bad idea',
-        author: 'Anonymous',
-        createdAt: '2020-12-13',
-        isHighlight: true,
-      },
-    ]
+    // TODO: Get comments
+    // state.comments = []
   },
   postComment(
     state,
@@ -92,7 +62,7 @@ const mutations = {
       isHighlight = false,
     }
   ) {
-    state.comments.push({
+    const comment = {
       uid,
       text,
       quote,
@@ -102,8 +72,10 @@ const mutations = {
       isHighlight,
       documentId: state.documentId,
       createdAt: dayjs().format(),
-    })
-    // Post comment
+    }
+    state.comments.push(comment)
+    // TODO: Post comment
+    // this.$axios.$post('api/v1/comments', comment)
   },
 }
 

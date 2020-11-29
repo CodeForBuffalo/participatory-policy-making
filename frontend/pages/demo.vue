@@ -163,10 +163,80 @@ export default {
     },
   },
   asyncData({ $axios, route, error, $config, store }) {
-    store.commit('annotateState/getComments')
-    return $axios.$get(`/content/rental_inspection.md`).then((res) => {
+    // const documentSlug = route.params.documentSlug || null // TODO: Create slugs for documents
+    // const meta = $axios
+    //   .$get(`api/v1/documents/${documentSlug}`)
+    //   .then((res) => {
+    //     if (res) {
+    store.commit('annotateState/initState', {
+      comments: [
+        {
+          range: 'type:textContent|392$426$19$default$',
+          quote: 'that rental properties in the City',
+          author: '',
+          text: 'is a test',
+          uid: '55de9556-fe0e-44f0-ab8c-32f31d23325a',
+          isHighlight: true,
+        },
+        {
+          range: 'type:textContent|831$874$20$default$',
+          quote: 'The legislation mirrors successful programs',
+          author: '',
+          text: 'this is a great idea',
+          uid: 'd45c725a-4924-4424-9b74-e98c21316b28',
+          isHighlight: true,
+        },
+      ],
+      votes: [
+        {
+          id: 0,
+          createdAt: '2020-12-12',
+          didSupport: true,
+          uid: '1234',
+        },
+        {
+          id: 1,
+          createdAt: '2020-12-13',
+          didSupport: false,
+          uid: '1235',
+        },
+        {
+          id: 2,
+          createdAt: '2020-12-13',
+          didSupport: false,
+          uid: '1236',
+        },
+        {
+          didSupport: false,
+          uid: '7f220f60-2bef-4507-9892-6bb54e031c49',
+        },
+      ],
+      documentId: 1234,
+    })
+    // // return {
+    const meta = {
+      title: 'Demo',
+      description: 'A description of the document',
+      url: $config.baseURL + route.path,
+    }
+    // }
+    //   } else {
+    //     throw new Error('Something went wrong')
+    //   }
+    // })
+    // .catch((err) => {
+    //   if (err) {
+    //     error({ statusCode: 404, message: 'Document not found' })
+    //   }
+    // })
+    const md = $axios.$get(`/content/rental_inspection.md`).then((res) => {
+      return fm(res)
+    })
+
+    return md.then((data) => {
       return {
-        md: fm(res),
+        md: data,
+        meta,
       }
     })
   },
@@ -257,7 +327,9 @@ export default {
   },
   head() {
     return {
-      title: 'Demo',
+      title: this.meta.title,
+      description: this.meta.description,
+      url: this.meta.url,
     }
   },
 }
