@@ -1,5 +1,5 @@
 <template>
-  <div class="position-relative">
+  <div>
     <div @mouseup="showButton()" @contextmenu.prevent="">
       <slot />
     </div>
@@ -97,7 +97,7 @@ export default {
       highlighter.addClassApplier(this.classApplier)
       highlighter.highlightSelection('default')
 
-      this.$store.commit('annotateState/createComment', {
+      this.$store.commit('annotateState/postComment', {
         ...highlight,
         uid,
         range: highlighter.serialize(),

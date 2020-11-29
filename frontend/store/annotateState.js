@@ -4,7 +4,31 @@ import { v4 as uuidv4 } from 'uuid'
 const state = () => {
   return {
     documentId: 1234,
-    comments: [
+    comments: [],
+    likes: [],
+    userLiked: null,
+  }
+}
+
+const mutations = {
+  getLikes(state) {
+    state.likes = []
+  },
+  getUserLiked(state) {
+    if (localStorage.getItem(state.documentId)) {
+      state.userLiked = JSON.parse(localStorage.getItem(state.documentId)).value
+    }
+  },
+  postLike(state, value) {
+    if (state.userLiked == null) {
+      // Post liked
+    }
+    const parsed = JSON.stringify({ value })
+    localStorage.setItem(state.documentId, parsed)
+    state.userLiked = value
+  },
+  getComments(state) {
+    state.comments = [
       {
         uid: '0',
         quote: 'that rental properties in the City',
@@ -23,12 +47,9 @@ const state = () => {
         createdAt: '2020-12-13',
         isHighlight: true,
       },
-    ],
-  }
-}
-
-const mutations = {
-  createComment(
+    ]
+  },
+  postComment(
     state,
     {
       uid = uuidv4(),
@@ -51,6 +72,7 @@ const mutations = {
       documentId: state.documentId,
       createdAt: dayjs().format(),
     })
+    // Post comment
   },
 }
 

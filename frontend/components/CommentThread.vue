@@ -86,7 +86,7 @@ export default {
   methods: {
     createComment(e, replyToUid) {
       const { author, text } = e
-      this.$store.commit('annotateState/createComment', {
+      this.$store.commit('annotateState/postComment', {
         author,
         text,
         replyToUid,

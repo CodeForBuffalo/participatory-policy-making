@@ -6,11 +6,11 @@
           <b-form-group>
             <b-form-radio-group
               id="supportToggle"
-              v-model="support.value"
               buttons
               button-variant="outline-secondary"
               class="w-100"
-              @input="toggleLiked()"
+              :checked="userLiked"
+              @input="(value) => toggleLiked(value)"
             >
               <b-form-radio
                 v-for="(option, idx) in support.options"
@@ -23,7 +23,7 @@
             </b-form-radio-group>
           </b-form-group>
         </b-col>
-        <b-col offset-lg="2" lg="8">
+        <b-col offset-lg="2" lg="8" class="position-static">
           <client-only>
             <Annotator
               ref="annotator"
@@ -97,7 +97,7 @@
         </div>
 
         <div v-else>
-          <div class="p-4 border-bottom">
+          <div class="px-4 pt-4">
             <div class="p-2 bg-light rounded border">
               <span class="font-weight-bold lead d-flex"
                 >"{{ newHighlight.quote }}"</span
@@ -162,7 +162,8 @@ export default {
       return dayjs(val).format(format)
     },
   },
-  asyncData({ $axios, route, error, $config }) {
+  asyncData({ $axios, route, error, $config, store }) {
+    store.commit('annotateState/getComments')
     return $axios.$get(`/content/rental_inspection.md`).then((res) => {
       return {
         md: fm(res),
@@ -172,7 +173,6 @@ export default {
   data() {
     return {
       support: {
-        value: null,
         options: [
           { text: 'I Support This', value: true },
           { text: 'I Do Not Support This', value: false },
@@ -191,11 +191,6 @@ export default {
     }
   },
   computed: {
-    activeComments() {
-      return this.comments.filter((comment) => {
-        return comment.replyToUid === this.selectedHighlight.uid
-      })
-    },
     highlights() {
       return this.$store.state.annotateState.comments.filter((comment) => {
         return comment.isHighlight === true
@@ -204,17 +199,21 @@ export default {
     comments() {
       return this.$store.state.annotateState.comments
     },
+    userLiked() {
+      return this.$store.state.annotateState.userLiked
+    },
+    likes() {
+      return this.$store.state.annotateState.likes
+    },
   },
   mounted() {
-    if (localStorage.getItem('liked')) {
-      const value = JSON.parse(localStorage.getItem('liked')).value
-      this.support.value = value
-    }
+    this.$store.commit('annotateState/getUserLiked')
   },
   methods: {
-    toggleLiked() {
-      const parsed = JSON.stringify({ value: this.support.value })
-      localStorage.setItem('liked', parsed)
+    toggleLiked(value) {
+      if (this.userLiked !== value) {
+        this.$store.commit('annotateState/postLike', value)
+      }
     },
     showHighlightComment(e) {
       this.selectedHighlight = e
@@ -243,7 +242,7 @@ export default {
     createComment(e) {
       const { author, text } = e
       const replyToUid = this.selectedHighlight.uid
-      this.$store.commit('annotateState/createComment', {
+      this.$store.commit('annotateState/postComment', {
         author,
         text,
         replyToUid,
